@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Random Character Names</string>
+    <string name="generate">Generate</string>
+    <string name="female">female</string>
+    <string name="name_length">name length</string>
+    <string name="_5">5</string>
+    <string name="male">male</string>
+    <string name="single">Single</string>
+    <string name="batch">Batch</string>
+</resources>
