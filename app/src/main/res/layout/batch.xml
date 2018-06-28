@@ -106,7 +106,6 @@
         android:layout_marginBottom="140dp"
         android:background="@android:color/white"
         android:numColumns="3"
-        android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@+id/generate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

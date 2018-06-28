@@ -22,8 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.miturtow.android.random_generated_names.R;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -43,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private String copiedText = "";
     private ConstraintSet single = new ConstraintSet();
     private ConstraintSet batch = new ConstraintSet();
+    private ConstraintSet history = new ConstraintSet();
     private ConstraintLayout layout;
 
     @Override
@@ -52,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         layout = findViewById(R.id.single_layout);
         single.clone(this, R.layout.single);
         batch.clone(this, R.layout.batch);
+        history.clone(this, R.layout.history);
         seekBarText = findViewById(R.id.seekBarText);
         SeekBar seekBar = findViewById(R.id.seekBar);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
