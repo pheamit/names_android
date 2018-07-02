@@ -7,4 +7,8 @@
     <string name="male">male</string>
     <string name="single">Single</string>
     <string name="batch">Batch</string>
+    <string name="history">History</string>
+    <string name="back">Back</string>
+    <string name="clean">Clean</string>
+    <string name="history_tip">Tap and hold to delete individual item</string>
 </resources>

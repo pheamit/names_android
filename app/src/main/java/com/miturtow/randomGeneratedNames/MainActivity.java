@@ -12,6 +12,7 @@ import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.view.View;
 import android.view.animation.AnticipateOvershootInterpolator;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -22,8 +23,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -32,17 +42,29 @@ public class MainActivity extends AppCompatActivity {
 
     private static final Random random = new Random();
     private static boolean female = false;
-    private static boolean toggle = false;
     private TextView singleView;
     private GridView batchView;
+    private GridView historyView;
     private TextView seekBarText;
     private ArrayList<String> names = new ArrayList<>();
     private ArrayAdapter<String> arrayAdapter;
-    private String copiedText = "";
+    private ConstraintSet current = new ConstraintSet();
     private ConstraintSet single = new ConstraintSet();
     private ConstraintSet batch = new ConstraintSet();
     private ConstraintSet history = new ConstraintSet();
     private ConstraintLayout layout;
+    private LinkedHashSet<String> tempHistory = new LinkedHashSet<>();
+    private LinkedList<String> historyList = new LinkedList<>();
+    private ArrayAdapter<String> historyAdapter;
+    private Toast clipboardToast;
+
+    public ConstraintSet getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(ConstraintSet current) {
+        this.current = current;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +72,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.single);
         layout = findViewById(R.id.single_layout);
         single.clone(this, R.layout.single);
+        current.clone(single);
         batch.clone(this, R.layout.batch);
         history.clone(this, R.layout.history);
+        readHistory();
+        clipboardToast = Toast.makeText(getApplicationContext(), "Copied to clipboard!",
+                Toast.LENGTH_SHORT);
         seekBarText = findViewById(R.id.seekBarText);
         SeekBar seekBar = findViewById(R.id.seekBar);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -72,32 +98,86 @@ public class MainActivity extends AppCompatActivity {
         });
         batchView = findViewById(R.id.gridView);
         batchView.setScrollbarFadingEnabled(false);
+        batchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String text = parent.getItemAtPosition(position).toString();
+                ClipboardManager clipboard = (ClipboardManager)
+                        getSystemService(Context.CLIPBOARD_SERVICE);
+                if (!text.isEmpty()) {
+                    tempHistory.add(text);
+                }
+                ClipData clipData = ClipData.newPlainText("Copied text", text);
+                assert clipboard != null;
+                clipboard.setPrimaryClip(clipData);
+                clipboardToast.show();
+            }
+        });
         singleView = findViewById(R.id.text_window);
         singleView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                copiedText = singleView.getText().toString();
-                ClipData clipData = ClipData.newPlainText("Copied text", copiedText);
+                String text = singleView.getText().toString();
+                ClipboardManager clipboard = (ClipboardManager)
+                        getSystemService(Context.CLIPBOARD_SERVICE);
+                tempHistory.add(text);
+                ClipData clipData = ClipData.newPlainText("Copied text", text);
                 assert clipboard != null;
                 clipboard.setPrimaryClip(clipData);
-                Toast.makeText(getApplicationContext(), "Copied to clipboard!", Toast.LENGTH_SHORT).show();
+                clipboardToast.show();
+            }
+        });
+        historyView = findViewById(R.id.historyGrid);
+        historyView.setScrollbarFadingEnabled(false);
+        historyView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String text = parent.getItemAtPosition(position).toString();
+                ClipboardManager clipboard = (ClipboardManager)
+                        getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clipData = ClipData.newPlainText("Copied text", text);
+                assert clipboard != null;
+                clipboard.setPrimaryClip(clipData);
+                clipboardToast.show();
+            }
+        });
+        historyView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                historyList.remove(position);
+                historyView.setAdapter(historyAdapter);
+                return true;
             }
         });
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, names);
-        ToggleButton toggleButton = findViewById(R.id.toggleButton);
-        toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                toggle = isChecked;
-            }
-        });
-        toggleButton.setOnClickListener(new View.OnClickListener() {
+        historyAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, historyList);
+        //Buttons
+        final ToggleButton singleBatchToggle = findViewById(R.id.singleBatchToggle);
+        singleBatchToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (toggle) {
+                if (singleBatchToggle.isChecked()) {
                     toggleView(batch);
-                } else toggleView(single);
+                    setCurrent(batch);
+                } else {
+                    toggleView(single);
+                    setCurrent(single);
+                }
+            }
+        });
+        final ToggleButton historyToggle = findViewById(R.id.historyToggle);
+        historyToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (historyToggle.isChecked()) {
+                    toggleView(history);
+                    if (!tempHistory.isEmpty()) {
+                        historyList.addAll(tempHistory);
+                        tempHistory.clear();
+                        persistHistory();
+                    }
+                    historyView.setAdapter(historyAdapter);
+                } else toggleView(getCurrent());
             }
         });
         Button generate = findViewById(R.id.generate);
@@ -105,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int length = Integer.parseInt(seekBarText.getText().toString());
-                if (toggle) {
+                if (singleBatchToggle.isChecked()) {
                     if (names.size() > 0) names.clear();
                     if (female) {
                         genFemale(length, 50);
@@ -119,6 +199,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        Button cleanHistory = findViewById(R.id.cleanHistory);
+        cleanHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (historyList.size() > 0) {
+                    historyList.clear();
+                    historyView.setAdapter(historyAdapter);
+                }
+            }
+        });
         RadioButton femaleRB = findViewById(R.id.female);
         femaleRB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -126,6 +216,34 @@ public class MainActivity extends AppCompatActivity {
                 female = isChecked;
             }
         });
+    }
+
+    private void readHistory() {
+        String fileName = "history";
+        File directory = getApplicationContext().getFilesDir();
+        File file = new File(directory, fileName);
+    }
+
+    private void persistHistory() {
+        String fileName = "history";
+        FileOutputStream outputStream;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
+        for (String element : historyList) {
+            try {
+                dos.writeUTF(element);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        byte[] bytes = baos.toByteArray();
+        try {
+            outputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
+            outputStream.write(bytes);
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void toggleView(ConstraintSet set) {
