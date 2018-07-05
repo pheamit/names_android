@@ -23,6 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.json.JSONArray;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -31,6 +33,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -75,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         current.clone(single);
         batch.clone(this, R.layout.batch);
         history.clone(this, R.layout.history);
-        readHistory();
+        historyList = readHistory("history");
         clipboardToast = Toast.makeText(getApplicationContext(), "Copied to clipboard!",
                 Toast.LENGTH_SHORT);
         seekBarText = findViewById(R.id.seekBarText);
@@ -174,10 +178,10 @@ public class MainActivity extends AppCompatActivity {
                     if (!tempHistory.isEmpty()) {
                         historyList.addAll(tempHistory);
                         tempHistory.clear();
-                        persistHistory();
                     }
                     historyView.setAdapter(historyAdapter);
                 } else toggleView(getCurrent());
+                persistHistory(historyList, "history");
             }
         });
         Button generate = findViewById(R.id.generate);
@@ -218,30 +222,27 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void readHistory() {
-        String fileName = "history";
-        File directory = getApplicationContext().getFilesDir();
-        File file = new File(directory, fileName);
+    private LinkedList<String> readHistory(String fileName) {
+        LinkedList<String> result = new LinkedList<>();
+        File file = new File(getApplicationContext().getFilesDir(), fileName);
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+            result = (LinkedList<String>) ois.readObject();
+            ois.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
-    private void persistHistory() {
-        String fileName = "history";
-        FileOutputStream outputStream;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
-        for (String element : historyList) {
-            try {
-                dos.writeUTF(element);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        byte[] bytes = baos.toByteArray();
+    private void persistHistory(LinkedList<String> list, String fileName) {
         try {
-            outputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
-            outputStream.write(bytes);
-            outputStream.close();
-        } catch (Exception e) {
+            File file = new File(getApplicationContext().getFilesDir(), fileName);
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
+            oos.writeObject(list);
+            oos.flush();
+            oos.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
