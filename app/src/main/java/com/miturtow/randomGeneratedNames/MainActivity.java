@@ -133,6 +133,14 @@ public class MainActivity extends AppCompatActivity {
         });
         historyView = findViewById(R.id.historyGrid);
         historyView.setScrollbarFadingEnabled(false);
+        historyView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                historyList.remove(position);
+                historyView.setAdapter(historyAdapter);
+                return true;
+            }
+        });
         historyView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -143,14 +151,6 @@ public class MainActivity extends AppCompatActivity {
                 assert clipboard != null;
                 clipboard.setPrimaryClip(clipData);
                 clipboardToast.show();
-            }
-        });
-        historyView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                historyList.remove(position);
-                historyView.setAdapter(historyAdapter);
-                return true;
             }
         });
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, names);
@@ -181,7 +181,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                     historyView.setAdapter(historyAdapter);
                 } else toggleView(getCurrent());
-                persistHistory(historyList, "history");
             }
         });
         Button generate = findViewById(R.id.generate);
@@ -222,6 +221,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        persistHistory(historyList, "history");
+    }
+
     private LinkedList<String> readHistory(String fileName) {
         LinkedList<String> result = new LinkedList<>();
         File file = new File(getApplicationContext().getFilesDir(), fileName);
@@ -236,6 +241,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void persistHistory(LinkedList<String> list, String fileName) {
+        if (!tempHistory.isEmpty()) {
+            list.addAll(tempHistory);
+            tempHistory.clear();
+        }
         try {
             File file = new File(getApplicationContext().getFilesDir(), fileName);
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
