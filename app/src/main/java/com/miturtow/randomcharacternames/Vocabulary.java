@@ -1,4 +1,4 @@
-package com.miturtow.randomGeneratedNames;
+package com.miturtow.randomcharacternames;
 
 import java.util.*;
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.miturtow.randomGeneratedNames">
+    package="com.miturtow.randomcharacternames">
 
     <application
         android:allowBackup="true"
@@ -9,7 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:fullBackupContent="@xml/backup_descriptor">
-        <activity android:name="com.miturtow.randomGeneratedNames.MainActivity">
+        <activity android:name="com.miturtow.randomcharacternames.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,4 +1,4 @@
-package com.miturtow.randomGeneratedNames;
+package com.miturtow.randomcharacternames;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -23,12 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import org.json.JSONArray;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

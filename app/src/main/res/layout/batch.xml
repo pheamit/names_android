@@ -5,7 +5,7 @@
     android:id="@+id/batch_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.miturtow.randomGeneratedNames.MainActivity"
+    tools:context="com.miturtow.randomcharacternames.MainActivity"
     tools:layout_editor_absoluteY="81dp">
 
     <TextView
