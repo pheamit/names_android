@@ -11,6 +11,7 @@ import android.transition.ChangeBounds;
 import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.view.View;
+import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -251,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void toggleView(ConstraintSet set) {
         Transition transition = new ChangeBounds();
-//        transition.setInterpolator(new AnticipateOvershootInterpolator(1.0f));
+        transition.setInterpolator(new AnticipateOvershootInterpolator(1.0f));
         TransitionManager.beginDelayedTransition(layout, transition);
         set.applyTo(layout);
     }
@@ -339,7 +340,7 @@ public class MainActivity extends AppCompatActivity {
                     nameSize += 2;
                 } else {
                     newLetter = Vocabulary.getConsonant();
-                    if (Vocabulary.notInBlackList(newLetter, previousLetter)/* && !newLetter.equals("")*/) {
+                    if (Vocabulary.notInBlackList(newLetter, previousLetter)) {
                         name.add(newLetter);
                         nameSize++;
                     }
@@ -354,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     newLetter = Vocabulary.getVowel();
-                    if (Vocabulary.notInBlackList(newLetter, previousLetter)/* && !newLetter.equals("")*/) {
+                    if (Vocabulary.notInBlackList(newLetter, previousLetter)) {
                         name.add(newLetter);
                         nameSize++;
                     }
