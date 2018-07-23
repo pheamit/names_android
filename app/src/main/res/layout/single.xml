@@ -15,8 +15,8 @@
         android:background="@android:drawable/editbox_background"
         android:gravity="center"
         android:textAlignment="center"
-        android:textSize="24sp"
         android:textColor="@android:color/black"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -101,18 +101,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <GridView
-        android:id="@+id/gridView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@android:color/white"
-        android:numColumns="3"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <ToggleButton
         android:id="@+id/singleBatchToggle"
         android:layout_width="wrap_content"
@@ -134,30 +122,6 @@
         android:textOn="@string/back"
         app:layout_constraintBottom_toTopOf="@+id/generate"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <TextView
-        android:id="@+id/historyLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="164dp"
-        android:layout_marginStart="162dp"
-        android:text="@string/history"
-        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        app:layout_constraintBottom_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <GridView
-        android:id="@+id/historyGrid"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:columnWidth="100dp"
-        android:numColumns="auto_fit"
-        app:layout_constraintBottom_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/cleanHistory"
@@ -181,5 +145,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/generate" />
+
+    <GridView
+        android:id="@+id/gridView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:numColumns="3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="parent" />
+
+    <GridView
+        android:id="@+id/historyGrid"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:numColumns="3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

@@ -3,15 +3,14 @@ package com.miturtow.randomGeneratedNames;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.transition.ChangeBounds;
 import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.view.View;
-import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -23,12 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import org.json.JSONArray;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -52,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView seekBarText;
     private ArrayList<String> names = new ArrayList<>();
     private ArrayAdapter<String> arrayAdapter;
-    private ConstraintSet current = new ConstraintSet();
+    private ConstraintSet last = new ConstraintSet();
     private ConstraintSet single = new ConstraintSet();
     private ConstraintSet batch = new ConstraintSet();
     private ConstraintSet history = new ConstraintSet();
@@ -62,12 +55,12 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> historyAdapter;
     private Toast clipboardToast;
 
-    public ConstraintSet getCurrent() {
-        return current;
+    public ConstraintSet getLast() {
+        return last;
     }
 
-    public void setCurrent(ConstraintSet current) {
-        this.current = current;
+    public void setLast(ConstraintSet last) {
+        this.last = last;
     }
 
     @Override
@@ -76,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.single);
         layout = findViewById(R.id.single_layout);
         single.clone(this, R.layout.single);
-        current.clone(single);
+        last.clone(single);
         batch.clone(this, R.layout.batch);
         history.clone(this, R.layout.history);
         historyList = readHistory("history");
@@ -153,8 +146,8 @@ public class MainActivity extends AppCompatActivity {
                 clipboardToast.show();
             }
         });
-        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, names);
-        historyAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, historyList);
+        arrayAdapter = new ArrayAdapter<>(this, R.layout.list_text_item, names);
+        historyAdapter = new ArrayAdapter<>(this, R.layout.list_text_item, historyList);
         //Buttons
         final ToggleButton singleBatchToggle = findViewById(R.id.singleBatchToggle);
         singleBatchToggle.setOnClickListener(new View.OnClickListener() {
@@ -162,10 +155,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (singleBatchToggle.isChecked()) {
                     toggleView(batch);
-                    setCurrent(batch);
+                    setLast(batch);
                 } else {
                     toggleView(single);
-                    setCurrent(single);
+                    setLast(single);
                 }
             }
         });
@@ -180,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
                         tempHistory.clear();
                     }
                     historyView.setAdapter(historyAdapter);
-                } else toggleView(getCurrent());
+                } else toggleView(getLast());
             }
         });
         Button generate = findViewById(R.id.generate);
@@ -258,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void toggleView(ConstraintSet set) {
         Transition transition = new ChangeBounds();
-        transition.setInterpolator(new AnticipateOvershootInterpolator(1.0f));
+//        transition.setInterpolator(new AnticipateOvershootInterpolator(1.0f));
         TransitionManager.beginDelayedTransition(layout, transition);
         set.applyTo(layout);
     }
