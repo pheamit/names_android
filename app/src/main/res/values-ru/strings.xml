@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Случайные Имена Персонажей</string>
+    <string name="generate">Генерировать</string>
+    <string name="female">жен</string>
+    <string name="name_length">длина имени</string>
+    <string name="male">муж</string>
+    <string name="single">Одно</string>
+    <string name="batch">Множество</string>
+    <string name="history">История</string>
+    <string name="back">Назад</string>
+    <string name="clean">Очистить</string>
+    <string name="history_tip">Нажать и удерживать для удаления</string>
+</resources>
