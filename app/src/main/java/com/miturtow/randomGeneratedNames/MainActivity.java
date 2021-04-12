@@ -3,9 +3,6 @@ package com.miturtow.randomGeneratedNames;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.transition.ChangeBounds;
 import android.transition.Transition;
@@ -23,12 +20,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import org.json.JSONArray;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -50,14 +45,14 @@ public class MainActivity extends AppCompatActivity {
     private GridView batchView;
     private GridView historyView;
     private TextView seekBarText;
-    private ArrayList<String> names = new ArrayList<>();
+    private final ArrayList<String> names = new ArrayList<>();
     private ArrayAdapter<String> arrayAdapter;
     private ConstraintSet current = new ConstraintSet();
-    private ConstraintSet single = new ConstraintSet();
-    private ConstraintSet batch = new ConstraintSet();
-    private ConstraintSet history = new ConstraintSet();
+    private final ConstraintSet single = new ConstraintSet();
+    private final ConstraintSet batch = new ConstraintSet();
+    private final ConstraintSet history = new ConstraintSet();
     private ConstraintLayout layout;
-    private LinkedHashSet<String> tempHistory = new LinkedHashSet<>();
+    private final LinkedHashSet<String> tempHistory = new LinkedHashSet<>();
     private LinkedList<String> historyList = new LinkedList<>();
     private ArrayAdapter<String> historyAdapter;
     private Toast clipboardToast;
@@ -79,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         current.clone(single);
         batch.clone(this, R.layout.batch);
         history.clone(this, R.layout.history);
-        historyList = readHistory("history");
+        historyList = readHistory();
         clipboardToast = Toast.makeText(getApplicationContext(), "Copied to clipboard!",
                 Toast.LENGTH_SHORT);
         seekBarText = findViewById(R.id.seekBarText);
@@ -191,9 +186,9 @@ public class MainActivity extends AppCompatActivity {
                 if (singleBatchToggle.isChecked()) {
                     if (names.size() > 0) names.clear();
                     if (female) {
-                        genFemale(length, 50);
+                        genFemaleBatch(length);
                     } else {
-                        genMale(length, 50);
+                        genMaleBatch(length);
                     }
                 } else {
                     if (female) {
@@ -224,12 +219,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        persistHistory(historyList, "history");
+        persistHistory(historyList);
     }
 
-    private LinkedList<String> readHistory(String fileName) {
+    private LinkedList<String> readHistory() {
         LinkedList<String> result = new LinkedList<>();
-        File file = new File(getApplicationContext().getFilesDir(), fileName);
+        File file = new File(getApplicationContext().getFilesDir(), "history");
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
             result = (LinkedList<String>) ois.readObject();
@@ -240,13 +235,13 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
-    private void persistHistory(LinkedList<String> list, String fileName) {
+    private void persistHistory(LinkedList<String> list) {
         if (!tempHistory.isEmpty()) {
             list.addAll(tempHistory);
             tempHistory.clear();
         }
         try {
-            File file = new File(getApplicationContext().getFilesDir(), fileName);
+            File file = new File(getApplicationContext().getFilesDir(), "history");
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
             oos.writeObject(list);
             oos.flush();
@@ -319,10 +314,9 @@ public class MainActivity extends AppCompatActivity {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
-    private void genMale(int length, int quantity) {
-        while (quantity > 0) {
+    private void genMaleBatch(int length) {
+        for (int i = 50; i > 0; i--) {
             names.add(genMale(length));
-            quantity--;
         }
         batchView.setAdapter(arrayAdapter);
     }
@@ -368,7 +362,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        Iterator iterator = name.descendingIterator();
+        Iterator<String> iterator = name.descendingIterator();
         StringBuilder result = new StringBuilder();
         while (iterator.hasNext()) {
             result.append(iterator.next());
@@ -376,10 +370,9 @@ public class MainActivity extends AppCompatActivity {
         return result.substring(0, 1).toUpperCase() + result.substring(1);
     }
 
-    private void genFemale(int length, int quantity) {
-        while (quantity > 0) {
+    private void genFemaleBatch(int length) {
+        for (int i = 50; i > 0; i--) {
             names.add(genFemale(length));
-            quantity--;
         }
         batchView.setAdapter(arrayAdapter);
     }

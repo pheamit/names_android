@@ -4,7 +4,7 @@ import java.util.*;
 
 class Vocabulary {
 
-    private static Random random = new Random();
+    private static final Random random = new Random();
     private static final List<String> VOWELS = Arrays.asList(
             "aeiou".split("(?!^)")
     );
